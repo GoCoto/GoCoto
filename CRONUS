@@ -1,0 +1,230 @@
+define time = 2000;
+            define rate_of_fire = 13;  // Rapidfire speed - Range: 1 to 25 RPS (Round/s)
+            define save         =  2;  // XB1_MENU - PS4_OPTIONS
+            define AR_switch    = 17;  // XB1_Y - PS4_TRIANGLE
+            define RF_switch       = 17;  // XB1_Y - PS4_TRIANGLE
+            //-------------------------------------------------------------------------------------------
+            define FIRE       =  3;  // XB1_RT - PS4_R2
+            define SCOPE      =  6;  // XB1_LT - PS4_L2
+            define UP         = 13;  // DPAD UP
+            define DOWN       = 14;  // DPAD DOWN
+            define LEFT       = 15;  // DPAD LEFT
+            define RIGHT      = 16;  // DPAD RIGHT
+            define JUMP       = 19;  // XB1_A - PS4_CROSS
+
+            //-------------------------------------------------------------------------------------------
+
+            define Blue      = 1;
+            define Red       = 2;
+            define Green     = 3;
+            define Pink      = 4;
+            define SkyBlue   = 5;
+            define Yellow    = 6;
+            define White     = 7;
+
+            data(1,
+              2,0,0,0, //1. Blue
+              0,2,0,0, //2. Red
+              0,0,2,0, //3. Lime/Green
+              0,0,0,2, //4. Fuchsia/Pink
+              2,0,2,0, //5. SkyBlue
+              0,2,2,0, //6. Yellow
+              2,2,2,2  //7. White
+            );
+            //-------------------------------------------------------------------------------------------
+            //VARIABLES - int
+
+            int recoil_onoff = TRUE;     // if TRUE Antirecoil is ON by default - if FALSE, OFF by default
+            int rapid_onoff  = TRUE;    // if TRUE Rapidfire for primary  - if FALSE, for secondary
+
+            int aa_delay = 20;
+
+            int ANTI_RECOIL;
+            int ANTI_RECOIL_H;
+            int anti_recoil;
+            int anti_recoil_H;
+
+            int ANTI_RECOIL2;
+            int ANTI_RECOIL_H2;
+            int anti_recoil2;
+            int anti_recoil_H2;
+
+            int timelimit = 300; // increase if is to fast
+            int DbleClick = 0;
+            int Col_ind;
+            int hold_time, rest_time;
+            //-------------------------------------------------------------------------------------------
+
+            //INITIALIZATION - init
+
+            init{
+
+                hold_time = 500 / rate_of_fire;
+                rest_time = hold_time - 20;
+                if(rest_time < 0) rest_time = 0;
+
+                ANTI_RECOIL   = get_pvar(SPVAR_1, -100, 100, 30);
+                ANTI_RECOIL_H = get_pvar(SPVAR_2, -100, 100, 0);
+                ANTI_RECOIL2  = get_pvar(SPVAR_3, -100, 100, 40);
+                ANTI_RECOIL_H2= get_pvar(SPVAR_4, -100, 100, 0);
+
+            }
+
+            //-------------------------------------------------------------------------------------------
+
+            //MAIN BLOCK ROUTINES
+
+            main {
+
+
+            if (get_val (SCOPE)) {
+                combo_run (AA_XY);
+                } else {
+                    combo_stop (AA_XY);
+            }
+
+            if(DbleClick > 0) DbleClick = DbleClick - get_rtime();
+            if(event_press(DOWN) && DbleClick <= 0) {DbleClick = timelimit; }
+            else if(event_press(DOWN) && DbleClick > 0) {rapid_onoff=!rapid_onoff; combo_run (vibrate);}
+
+
+                     if(recoil_onoff) colourled(Green);
+                     else colourled(Red);
+
+                // RAPIDFIRE
+                     if(get_val(3) && rapid_onoff) {
+                        combo_run(RapidFire);
+                    } else if(combo_running(RapidFire)) {
+                        combo_stop(RapidFire);
+                    }
+
+                if(event_press(AR_switch))  {recoil_onoff = !recoil_onoff; }
+                if(event_press(RIGHT) && !get_val(SCOPE))  { recoil_onoff = TRUE;}
+
+            if(recoil_onoff) {
+                if(get_val(7) && !get_val(FIRE)) {
+                    if(event_press(UP)){
+                        ANTI_RECOIL = ANTI_RECOIL+ 1; combo_run (vibrate);
+                    }
+                    if(event_press(DOWN)) {
+                        ANTI_RECOIL = ANTI_RECOIL- 1; combo_run (vibrate);
+                    }
+                    set_val(UP,0); set_val(DOWN,0);
+
+                    if(event_press(LEFT)){
+                        ANTI_RECOIL_H = ANTI_RECOIL_H+ 1; combo_run (vibrate);
+                    }
+                    if(event_press(RIGHT)) {
+                        ANTI_RECOIL_H = ANTI_RECOIL_H- 1; combo_run (vibrate);
+                    }
+                    set_val(LEFT,0); set_val(RIGHT,0);
+                }}
+
+            if(!recoil_onoff) {
+                if(get_val(7) && !get_val(FIRE)) {
+                    if(event_press(UP)){
+                        ANTI_RECOIL2 = ANTI_RECOIL2+ 1; combo_run (vibrate);
+                    }
+                    if(event_press(DOWN)) {
+                        ANTI_RECOIL2 = ANTI_RECOIL2- 1; combo_run (vibrate);
+                    }
+                    set_val(UP,0); set_val(DOWN,0);
+
+                    if(event_press(LEFT)){
+                        ANTI_RECOIL_H2 = ANTI_RECOIL_H2+ 1; combo_run (vibrate);
+                    }
+                    if(event_press(RIGHT)) {
+                        ANTI_RECOIL_H2 = ANTI_RECOIL_H2- 1; combo_run (vibrate);
+                    }
+                    set_val(LEFT,0); set_val(RIGHT,0);
+                }}
+
+                if(get_val(SCOPE) && event_press(save)){
+                    combo_run(vibrate);
+                    set_pvar(SPVAR_1, ANTI_RECOIL);
+                    set_pvar(SPVAR_2, ANTI_RECOIL_H);
+                    set_pvar(SPVAR_3, ANTI_RECOIL2);
+                    set_pvar(SPVAR_4, ANTI_RECOIL_H2);
+                    set_val(save, 0);
+                }
+                if(recoil_onoff) {
+                if(get_val(FIRE) && get_val(SCOPE)) {
+                    combo_run(AntiRecoil);
+                    }
+                }
+                if(!recoil_onoff) {
+                if(get_val(FIRE) && get_val(SCOPE)) {
+                    combo_run(AntiRecoil2);
+                    }
+                }
+                if(abs(get_val(10)) > ANTI_RECOIL + 10 || abs(get_val(9)) > ANTI_RECOIL + 10) {
+                    combo_stop (AntiRecoil);
+                }
+                if(abs(get_val(10)) > ANTI_RECOIL2 + 10 || abs(get_val(9)) > ANTI_RECOIL2 + 10) {
+                    combo_stop (AntiRecoil2);
+                }
+
+
+            }
+            //-------------------------------------------------------------------------------------------
+
+            //COMBO BLOCKS
+
+            combo vibrate {
+                set_rumble(RUMBLE_A, 50);
+                wait(300);
+                reset_rumble();
+                }
+
+            combo RapidFire {
+                set_val(FIRE, 100);
+                wait(hold_time);
+                set_val(FIRE, 0);
+                wait(rest_time);
+                set_val(FIRE, 0);
+                }
+
+            combo AntiRecoil {
+                anti_recoil = get_val(10) + ANTI_RECOIL;
+                if(anti_recoil > 100) anti_recoil = 100;
+                set_val(10, anti_recoil);
+                anti_recoil_H = get_val(9) + ANTI_RECOIL_H;
+                if(anti_recoil_H > 100) anti_recoil_H = 100;
+                set_val(9, anti_recoil_H);
+                }
+
+            combo AntiRecoil2 {
+                anti_recoil2 = get_val(10) + ANTI_RECOIL2;
+                if(anti_recoil2 > 100) anti_recoil2 = 100;
+                set_val(10, anti_recoil2);
+                anti_recoil_H2 = get_val(9) + ANTI_RECOIL_H2;
+                if(anti_recoil_H2 > 100) anti_recoil_H2 = 100;
+                set_val(9, anti_recoil_H2);
+                }
+
+            combo AA_XY {
+                set_val (10, xy_val (10, aa_p));
+                wait (aa_delay)
+                set_val (9, xy_val (9, aa_p)) ;
+                wait (aa_delay)
+                set_val (10, xy_val (10, aa_n));
+                wait (aa_delay)
+                set_val (9, xy_val (9, aa_n));
+                wait (aa_delay)
+                }
+
+            function xy_val (f_axis, f_val) {
+                if (abs (get_val (f_axis)) <release)
+                    return f_val;
+                return get_val (f_axis);
+                }
+
+            // COLOR LED function
+            //--------------------------------------------------------------
+            function colourled(Colour) {
+                Col_ind=(Colour*4) - 3;
+                set_led(LED_1,dbyte(Col_ind  ));
+                set_led(LED_2,dbyte(Col_ind + 1));
+                set_led(LED_3,dbyte(Col_ind + 2));
+                set_led(LED_4,dbyte(Col_ind + 3));
+            }//end
