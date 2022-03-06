@@ -1,6 +1,5 @@
-define time = 2000;
-            define rate_of_fire = 13;  // Rapidfire speed - Range: 1 to 25 RPS (Round/s)
-            define save         =  2;  // XB1_MENU - PS4_OPTIONS
+define time = 1000;
+            define rate_of_fire = 10;  // Rapidfire speed 
             define AR_switch    = 17;  // XB1_Y - PS4_TRIANGLE
             define RF_switch       = 17;  // XB1_Y - PS4_TRIANGLE
             //-------------------------------------------------------------------------------------------
@@ -37,7 +36,7 @@ define time = 2000;
             int recoil_onoff = TRUE;     // if TRUE Antirecoil is ON by default - if FALSE, OFF by default
             int rapid_onoff  = TRUE;    // if TRUE Rapidfire for primary  - if FALSE, for secondary
 
-            int aa_delay = 20;
+            int aa_delay = 10;
 
             int ANTI_RECOIL;
             int ANTI_RECOIL_H;
@@ -49,7 +48,7 @@ define time = 2000;
             int anti_recoil2;
             int anti_recoil_H2;
 
-            int timelimit = 300; // increase if is to fast
+            int timelimit = 500;
             int DbleClick = 0;
             int Col_ind;
             int hold_time, rest_time;
@@ -60,12 +59,12 @@ define time = 2000;
             init{
 
                 hold_time = 500 / rate_of_fire;
-                rest_time = hold_time - 20;
+                rest_time = hold_time - 10;
                 if(rest_time < 0) rest_time = 0;
 
-                ANTI_RECOIL   = get_pvar(SPVAR_1, -100, 100, 30);
+                ANTI_RECOIL   = get_pvar(SPVAR_1, -100, 100, 20);
                 ANTI_RECOIL_H = get_pvar(SPVAR_2, -100, 100, 0);
-                ANTI_RECOIL2  = get_pvar(SPVAR_3, -100, 100, 40);
+                ANTI_RECOIL2  = get_pvar(SPVAR_3, -100, 100, 30);
                 ANTI_RECOIL_H2= get_pvar(SPVAR_4, -100, 100, 0);
 
             }
@@ -172,7 +171,7 @@ define time = 2000;
 
             combo vibrate {
                 set_rumble(RUMBLE_A, 50);
-                wait(300);
+                wait(500);
                 reset_rumble();
                 }
 
